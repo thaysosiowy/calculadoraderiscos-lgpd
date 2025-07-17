@@ -16,14 +16,7 @@
     background: #111139;
     min-height: 100vh;
     color: #333;
-    
-    /* Logo no canto superior direito */
-    background-image: url('logobranca.png');
-    background-repeat: no-repeat;
-    background-position: top right;
-    background-size: 150px 150px;
-    background-attachment: fixed;
-}
+        }
         
         .container {
             max-width: 1200px;
@@ -31,11 +24,18 @@
             padding: 20px;
         }
 
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 40px;
-        }
+       .header {
+    text-align: center;
+    color: white;
+    margin-bottom: 40px;
+    
+    /* Logo como background do header */
+    background-image: url('logobranca.png');
+    background-repeat: no-repeat;
+    background-position: center top;
+    background-size: 100px 100px;
+    padding-top: 120px; /* Espaço para a logo */
+}
 
         .header h1 {
             font-size: 2.5rem;
