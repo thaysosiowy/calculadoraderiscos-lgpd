@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Riscos LGPD - Metodologia Oficial ANPD</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .warning-banner {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .warning-banner h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .calculator-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .results-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .result-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .result-critical {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .result-critical .result-value {
+            color: #f44336;
+        }
+
+        .result-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .result-warning .result-value {
+            color: #ff9800;
+        }
+
+        .result-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .result-info .result-value {
+            color: #2196f3;
+        }
+
+        .methodology-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .methodology-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .methodology-step {
+            margin-bottom: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+
+        .risk-level {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .risk-low {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .risk-medium {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 2px solid #ff9800;
+        }
+
+        .risk-high {
+            background: #ffebee;
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+
+        .comparison-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .comparison-card {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .comparison-brazil {
+            background: #e8f5e8;
+            border: 2px solid #4caf50;
+        }
+
+        .comparison-europe {
+            background: #ffebee;
+            border: 2px solid #f44336;
+        }
+
+        .consciousness-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 30px;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .timeline-item {
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .timeline-past {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+        }
+
+        .timeline-current {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            animation: pulse 2s infinite;
+        }
+
+        .timeline-future {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .cases-grid, .sectors-grid, .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .case-card, .sector-card, .impact-item {
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .case-critical {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .case-warning {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .case-info {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .sector-health {
+            background: linear-gradient(135deg, #ffcdd2, #f8bbd9);
+            border-left: 4px solid #e91e63;
+        }
+
+        .sector-finance {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-left: 4px solid #ff9800;
+        }
+
+        .sector-education {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #2196f3;
+        }
+
+        .impact-micro {
+            background: #e8f5e8;
+            border-left: 4px solid #4caf50;
+        }
+
+        .impact-small {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .impact-medium {
+            background: #ffebee;
+            border-left: 4px solid #f44336;
+        }
+
+        .impact-large {
+            background: #fce4ec;
+            border-left: 4px solid #e91e63;
+        }
+
+        .urgency-banner {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .urgency-banner h3 {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .stats-urgency {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .stat-urgent {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .comparison-grid, .timeline-grid, .cases-grid, .sectors-grid, .impact-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-urgency {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Calculadora de Riscos LGPD</h1>
+            <p>Metodologia Oficial da ANPD - Resolução CD/ANPD nº 4/2023</p>
+        </div>
+
+        <div class="warning-banner">
+            <h2>⚠️ ATENÇÃO: A Fiscalização da LGPD Está Intensificando!</h2>
+            <p>A ANPD já aplicou a primeira multa e está preparando uma onda de fiscalizações. Calcule seu risco real agora!</p>
+        </div>
+
+        <div class="calculator-card">
+            <h2 style="margin-bottom: 25px; color: #333;">Dados da Sua Empresa</h2>
+            
+            <form id="riskForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="companyName">Nome da Empresa</label>
+                        <input type="text" id="companyName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="sector">Setor de Atividade</label>
+                        <select id="sector" required>
+                            <option value="">Selecione o setor</option>
+                            <option value="saude">Saúde</option>
+                            <option value="financeiro">Financeiro</option>
+                            <option value="educacao">Educação</option>
+                            <option value="tecnologia">Tecnologia</option>
+                            <option value="varejo">Varejo</option>
+                            <option value="servicos">Serviços</option>
+                            <option value="industria">Indústria</option>
+                            <option value="outros">Outros</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="revenue">Faturamento Anual (R$)</label>
+                        <input type="number" id="revenue" placeholder="Ex: 1000000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="companySize">Porte da Empresa</label>
+                        <select id="companySize" required>
+                            <option value="">Selecione o porte</option>
+                            <option value="micro">Microempresa (até R$ 360 mil)</option>
+                            <option value="pequena">Pequena (até R$ 4,8 milhões)</option>
+                            <option value="media">Média (até R$ 300 milhões)</option>
+                            <option value="grande">Grande (acima R$ 300 milhões)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="infraction">Tipo de Infração Potencial</label>
+                    <select id="infraction" required>
+                        <option value="">Selecione o tipo de infração</option>
+                        <option value="leve">LEVE: Falta de encarregado, política de privacidade básica</option>
+                        <option value="media">MÉDIA: Tratamento sem base legal, não atendimento de direitos</option>
+                        <option value="grave">GRAVE: Dados sensíveis sem consentimento, vazamento por negligência</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="damageLevel">Grau do Dano (0 a 1)</label>
+                        <select id="damageLevel" required>
+                            <option value="">Selecione o grau do dano</option>
+                            <option value="0.2">0.2 - Dano mínimo (poucos titulares, dados não sensíveis)</option>
+                            <option value="0.5">0.5 - Dano moderado (médio número, alguns dados sensíveis)</option>
+                            <option value="0.8">0.8 - Dano grave (muitos titulares, dados sensíveis)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="factors">Fatores Agravantes/Atenuantes</label>
+                        <select id="factors" required>
+                            <option value="">Selecione os fatores</option>
+                            <option value="-0.2">Cooperação total + Compliance (-20%)</option>
+                            <option value="-0.1">Cooperação parcial (-10%)</option>
+                            <option value="0">Neutro (0%)</option>
+                            <option value="0.1">Falta de cooperação (+10%)</option>
+                            <option value="0.3">Reincidência + Não cooperação (+30%)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">🧮 Calcular Risco de Multa LGPD</button>
+            </form>
+        </div>
+
+        <div class="results-card" id="resultsCard">
+            <h2 style="margin-bottom: 25px; color: #333;">Resultado da Análise de Risco</h2>
+            
+            <div id="riskLevel" class="risk-level"></div>
+            
+            <div id="calculationResults"></div>
+            
+            <div class="methodology-info">
+                <h3>📋 Metodologia Oficial ANPD (4 Etapas)</h3>
+                <div class="methodology-step">
+                    <strong>Etapa 1:</strong> Determinação da alíquota-base conforme classificação da infração
+                </div>
+                <div class="methodology-step">
+                    <strong>Etapa 2:</strong> Cálculo do valor-base (alíquota × faturamento)
+                </div>
+                <div class="methodology-step">
+                    <strong>Etapa 3:</strong> Aplicação de agravantes e atenuantes
+                </div>
+                <div class="methodology-step">
+                    <strong>Etapa 4:</strong> Adequação aos limites legais (R$ 2.000 a R$ 50 milhões)
+                </div>
+            </div>
+        </div>
+
+        <div class="comparison-section">
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">🌍 Comparação: Brasil vs Europa</h2>
+            <div class="comparison-grid">
+                <div class="comparison-card comparison-brazil">
+                    <h3>🇧🇷 Brasil (LGPD)</h3>
+                    <p><strong>Multas aplicadas:</strong> 1 (R$ 14.400)</p>
+                    <p><strong>Limite máximo:</strong> R$ 50 milhões</p>
+                    <p><strong>Status:</strong> Fiscalização inicial</p>
+                    <p><strong>Tendência:</strong> Intensificação em 2025</p>
+                </div>
+                <div class="comparison-card comparison-europe">
+                    <h3>🇪🇺 Europa (GDPR)</h3>
+                    <p><strong>Multas aplicadas:</strong> 2.000+ (€5,3 bilhões)</p>
+                    <p><strong>Maior multa:</strong> €1,2 bilhão (Meta)</p>
+                    <p><strong>Status:</strong> Enforcement rigoroso</p>
+                    <p><strong>Tendência:</strong> Multas crescentes</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="consciousness-section">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">⚡ Por Que Sua Empresa Precisa Calcular o Risco AGORA</h2>
+            
+            <div class="timeline-section">
+                <h3 style="color: #333; margin-bottom: 20px;">📅 Timeline do Enforcement LGPD</h3>
+                <div class="timeline-grid">
+                    <div class="timeline-item timeline-past">
+                        <h4>2024 - Preparação</h4>
+                        <p>✅ ANPD estruturando fiscalização</p>
+                        <p>✅ Primeira multa aplicada (R$ 14.400)</p>
+                        <p>✅ Empresas ainda subestimando</p>
+                    </div>
+                    <div class="timeline-item timeline-current">
+                        <h4>2025 - INTENSIFICAÇÃO</h4>
+                        <p>🔥 Fiscalizações massivas</p>
+                        <p>🔥 Multas na casa dos milhões</p>
+                        <p>🔥 Setores sensíveis no foco</p>
+                    </div>
+                    <div class="timeline-item timeline-future">
+                        <h4>2026+ - Enforcement Total</h4>
+                        <p>💥 Multas rotineiras e pesadas</p>
+                        <p>💥 Empresas fechando</p>
+                        <p>💥 Sobrevivem apenas as adequadas</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cases-section">
+                <h3 style="color: #333; margin-bottom: 20px;">🌍 Casos Reais: Europa Mostra o Futuro</h3>
+                <div class="cases-grid">
+                    <div class="case-card case-critical">
+                        <h4>Meta (Facebook)</h4>
+                        <p><strong>Multa:</strong> €1,2 bilhão</p>
+                        <p><strong>Motivo:</strong> Transferência inadequada de dados</p>
+                        <p><strong>Lição:</strong> Gigantes não estão imunes</p>
+                    </div>
+                    <div class="case-card case-warning">
+                        <h4>Clínica Odontológica</h4>
+                        <p><strong>Multa:</strong> €10.000</p>
+                        <p><strong>Motivo:</strong> Política de privacidade inadequada</p>
+                        <p><strong>Lição:</strong> Pequenas empresas também sofrem</p>
+                    </div>
+                    <div class="case-card case-info">
+                        <h4>Salão de Beleza</h4>
+                        <p><strong>Multa:</strong> €9.380</p>
+                        <p><strong>Motivo:</strong> Câmeras sem aviso aos clientes</p>
+                        <p><strong>Lição:</strong> Detalhes fazem diferença</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sectors-risk">
+                <h3 style="color: #333; margin-bottom: 20px;">🎯 Setores em Risco Crítico</h3>
+                <div class="sectors-grid">
+                    <div class="sector-card sector-health">
+                        <h4>🏥 Saúde</h4>
+                        <p><strong>Risco:</strong> CRÍTICO</p>
+                        <p>Dados sensíveis, prontuários, telemedicina</p>
+                        <p><strong>Europa:</strong> 23% das multas</p>
+                    </div>
+                    <div class="sector-card sector-finance">
+                        <h4>💰 Financeiro</h4>
+                        <p><strong>Risco:</strong> ALTO</p>
+                        <p>Open Banking, APIs, transações</p>
+                        <p><strong>Fiscalização:</strong> ANPD + Bacen</p>
+                    </div>
+                    <div class="sector-card sector-education">
+                        <h4>🎓 Educação</h4>
+                        <p><strong>Risco:</strong> ALTO</p>
+                        <p>Dados de menores, EAD, histórico</p>
+                        <p><strong>Cuidado:</strong> Consentimento dos pais</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="impact-calculator">
+                <h3 style="color: #333; margin-bottom: 20px;">💥 Impacto Real por Porte de Empresa</h3>
+                <div class="impact-grid">
+                    <div class="impact-item impact-micro">
+                        <h4>Microempresa</h4>
+                        <p><strong>Multa:</strong> R$ 2.000 - R$ 7.200</p>
+                        <p><strong>Impacto:</strong> 2 meses de faturamento</p>
+                        <p><strong>Consequência:</strong> Dificuldade com fornecedores</p>
+                    </div>
+                    <div class="impact-item impact-small">
+                        <h4>Pequena Empresa</h4>
+                        <p><strong>Multa:</strong> R$ 24.000 - R$ 96.000</p>
+                        <p><strong>Impacto:</strong> 6 meses de lucro</p>
+                        <p><strong>Consequência:</strong> Demissões e cortes</p>
+                    </div>
+                    <div class="impact-item impact-medium">
+                        <h4>Média Empresa</h4>
+                        <p><strong>Multa:</strong> R$ 1,5M - R$ 6M</p>
+                        <p><strong>Impacto:</strong> 1 ano de crescimento</p>
+                        <p><strong>Consequência:</strong> Reestruturação forçada</p>
+                    </div>
+                    <div class="impact-item impact-large">
+                        <h4>Grande Empresa</h4>
+                        <p><strong>Multa:</strong> R$ 6M - R$ 50M</p>
+                        <p><strong>Impacto:</strong> Prejuízo no balanço</p>
+                        <p><strong>Consequência:</strong> Perda de valor de mercado</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="urgency-banner">
+                <h3>⚠️ NÃO ESPERE SER O PRÓXIMO CASO DE ESTUDO!</h3>
+                <p>A ANPD está estruturando fiscalizações massivas para 2025. Cada dia sem adequação é um dia mais próximo da multa que pode quebrar sua empresa.</p>
+                <div class="stats-urgency">
+                    <div class="stat-urgent">
+                        <span class="stat-number">77%</span>
+                        <span class="stat-label">das empresas brasileiras NÃO estão adequadas</span>
+                    </div>
+                    <div class="stat-urgent">
+                        <span class="stat-number">€5,3B</span>
+                        <span class="stat-label">já foram pagos em multas na Europa</span>
+                    </div>
+                    <div class="stat-urgent">
+                        <span class="stat-number">2025</span>
+                        <span class="stat-label">ano da intensificação no Brasil</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Função principal de cálculo de risco
+        document.getElementById('riskForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateRisk();
+        });
+
+        function calculateRisk() {
+            // Coleta dos dados do formulário
+            const companyName = document.getElementById('companyName').value;
+            const sector = document.getElementById('sector').value;
+            const revenue = parseFloat(document.getElementById('revenue').value);
+            const companySize = document.getElementById('companySize').value;
+            const infraction = document.getElementById('infraction').value;
+            const damageLevel = parseFloat(document.getElementById('damageLevel').value);
+            const factors = parseFloat(document.getElementById('factors').value);
+
+            // ETAPA 1: Determinação da alíquota-base
+            let A1, A2;
+            switch(infraction) {
+                case 'leve':
+                    A1 = 0.001; // 0.1%
+                    A2 = 0.005; // 0.5%
+                    break;
+                case 'media':
+                    A1 = 0.005; // 0.5%
+                    A2 = 0.01;  // 1.0%
+                    break;
+                case 'grave':
+                    A1 = 0.01;  // 1.0%
+                    A2 = 0.02;  // 2.0%
+                    break;
+            }
+
+            const aliquotaBase = A1 + ((A2 - A1) * damageLevel);
+
+            // ETAPA 2: Determinação do valor-base
+            const valorBase = aliquotaBase * revenue;
+
+            // ETAPA 3: Determinação do valor da multa
+            let valorMulta = valorBase * (1 + factors);
+
+            // ETAPA 4: Adequação aos limites legais
+            const limiteMinimo = 2000;
+            const limiteMaximo = 50000000;
+            const limiteFaturamento = revenue * 0.02; // 2% do faturamento
+
+            if (valorMulta < limiteMinimo) {
+                valorMulta = limiteMinimo;
+            }
+            if (valorMulta > limiteMaximo) {
+                valorMulta = limiteMaximo;
+            }
+            if (valorMulta > limiteFaturamento) {
+                valorMulta = limiteFaturamento;
+            }
+
+            // Determinação do nível de risco
+            let riskLevel, riskClass, riskMessage;
+            const percentualFaturamento = (valorMulta / revenue) * 100;
+
+            if (percentualFaturamento < 0.5) {
+                riskLevel = 'RISCO BAIXO';
+                riskClass = 'risk-low';
+                riskMessage = 'Sua empresa tem baixo risco de multa LGPD no cenário atual.';
+            } else if (percentualFaturamento < 1.5) {
+                riskLevel = 'RISCO MÉDIO';
+                riskClass = 'risk-medium';
+                riskMessage = 'Atenção! Sua empresa tem risco moderado de multa LGPD.';
+            } else {
+                riskLevel = 'RISCO ALTO';
+                riskClass = 'risk-high';
+                riskMessage = '⚠️ ALERTA! Sua empresa tem alto risco de multa LGPD!';
+            }
+
+            // Exibição dos resultados
+            displayResults(companyName, aliquotaBase, valorBase, valorMulta, percentualFaturamento, riskLevel, riskClass, riskMessage, infraction);
+        }
+
+        function displayResults(companyName, aliquotaBase, valorBase, valorMulta, percentualFaturamento, riskLevel, riskClass, riskMessage, infraction) {
+            const resultsCard = document.getElementById('resultsCard');
+            const riskLevelDiv = document.getElementById('riskLevel');
+            const calculationResults = document.getElementById('calculationResults');
+
+            // Configuração do nível de risco
+            riskLevelDiv.className = `risk-level ${riskClass}`;
+            riskLevelDiv.innerHTML = `${riskLevel}<br><small>${riskMessage}</small>`;
+
+            // Resultados detalhados
+            calculationResults.innerHTML = `
+                <div class="result-item result-info">
+                    <span class="result-label">Empresa Analisada:</span>
+                    <span class="result-value">${companyName}</span>
+                </div>
+                <div class="result-item result-info">
+                    <span class="result-label">Classificação da Infração:</span>
+                    <span class="result-value">${infraction.toUpperCase()}</span>
+                </div>
+                <div class="result-item result-info">
+                    <span class="result-label">Alíquota-base Calculada:</span>
+                    <span class="result-value">${(aliquotaBase * 100).toFixed(3)}%</span>
+                </div>
+                <div class="result-item result-warning">
+                    <span class="result-label">Valor-base da Multa:</span>
+                    <span class="result-value">R$ ${valorBase.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item result-critical">
+                    <span class="result-label">MULTA FINAL ESTIMADA:</span>
+                    <span class="result-value">R$ ${valorMulta.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span>
+                </div>
+                <div class="result-item result-warning">
+                    <span class="result-label">Percentual do Faturamento:</span>
+                    <span class="result-value">${percentualFaturamento.toFixed(2)}%</span>
+                </div>
+                <div class="result-item result-info">
+                    <span class="result-label">Base Legal:</span>
+                    <span class="result-value">Resolução CD/ANPD nº 4/2023</span>
+                </div>
+            `;
+
+            // Exibir resultados
+            resultsCard.style.display = 'block';
+            resultsCard.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Formatação automática do campo de faturamento
+        document.getElementById('revenue').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            e.target.value = value;
+        });
+
+        // Adicionar animação de contagem para estatísticas
+        function animateStats() {
+            const statNumbers = document.querySelectorAll('.stat-number');
+            statNumbers.forEach(stat => {
+                const finalValue = stat.textContent;
+                if (finalValue.includes('%')) {
+                    const numValue = parseInt(finalValue);
+                    animateNumber(stat, 0, numValue, '%');
+                }
+            });
+        }
+
+        function animateNumber(element, start, end, suffix = '') {
+            const duration = 2000;
+            const increment = (end - start) / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= end) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + suffix;
+            }, 16);
+        }
+
+        // Executar animação quando a seção ficar visível
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateStats();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urgencyBanner = document.querySelector('.urgency-banner');
+            if (urgencyBanner) {
+                observer.observe(urgencyBanner);
+            }
+        });
+    </script>
+</body>
+</html>
+
